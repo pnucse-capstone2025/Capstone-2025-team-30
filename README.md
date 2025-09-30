@@ -119,10 +119,10 @@
 
 #### 4.3. 디렉토리 구조
 
-```
+```          
 repo-root/
-├─ docs
-├─ algorithms
+├─ docs                     # 보고서, 포스터, 발표자료 등 문서
+├─ algorithms               # DQN 기반 개선된 알고리즘 실험 관련 파일
 ├─ frontend/                # React + Vite 대시보드 (실험 관리 UI)
 │  ├─ src/
 │  │  ├─ features/         # 기능별 컴포넌트 (dashboard, model-test, results)

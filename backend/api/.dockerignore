@@ -1,0 +1,54 @@
+# Dependencies
+**/node_modules
+**/npm-debug.log
+**/yarn-error.log
+**/package-lock.json
+**/yarn.lock
+
+# Build outputs
+**/dist
+**/build
+**/.next
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# IDE/Editor files
+**/.vscode
+**/.vs
+**/.idea
+**/.project
+**/.settings
+
+# Git
+**/.git
+**/.gitignore
+
+# Docker files
+**/Dockerfile*
+**/docker-compose*
+**/compose.y*ml
+**/.dockerignore
+
+# Logs
+**/*.log
+**/logs
+
+# Test coverage
+**/coverage
+**/.nyc_output
+
+# Temporary files
+**/.tmp
+**/tmp
+**/*.temp
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+# Documentation
+**/README.md
+**/LICENSE

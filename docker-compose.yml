@@ -1,0 +1,94 @@
+services:
+  # MongoDB 서비스
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: rl_dashboard
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - unity-network
+
+  # FastAPI 유니티 서비스
+  mlagents-gym:
+    build: 
+      context: ./backend
+      dockerfile: fast_unity/Dockerfile
+    container_name: mlagents-gym
+    volumes:
+      - ./backend/fast_unity/unity/envs:/app/unity/envs
+      - ./backend/fast_unity/models:/app/models
+      - ./backend/fast_unity/train_logs:/app/train_logs
+    environment:
+      - DISPLAY=:0
+      - API_SERVER_URL=http://api-server:8080
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    tty: true
+    networks:
+      - unity-network
+    depends_on:
+      - signaling-server
+
+  # Node.js API 서버 (BFF)
+  api-server:
+    build: 
+      context: ./backend/api
+      dockerfile: Dockerfile
+    container_name: api-server
+    depends_on:
+      - mongodb
+      - mlagents-gym
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_DB: ${MONGODB_DB}
+      FASTAPI_BASE: ${FASTAPI_BASE}
+    networks:
+      - unity-network
+    restart: unless-stopped
+
+  # WebSocket 시그널링 서버
+  signaling-server:
+    build: 
+      context: ./backend/signaling-server
+      dockerfile: Dockerfile
+    container_name: signaling-server
+    networks:
+      - unity-network
+    restart: unless-stopped
+
+  # 메인 Nginx 리버스 프록시 (Frontend 빌드 포함)
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.nginx
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api-server
+      - signaling-server
+    networks:
+      - unity-network
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run --token ${CLOUDFLARE_TOKEN}
+    networks:
+      - unity-network
+    depends_on:
+      - nginx
+
+volumes:
+  mongodb_data:
+
+networks:
+  unity-network:
+    driver: bridge

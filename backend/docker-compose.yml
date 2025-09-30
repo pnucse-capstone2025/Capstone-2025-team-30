@@ -1,0 +1,76 @@
+services:
+  # MongoDB 서비스 추가
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: rl_dashboard
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - unity-network
+
+  # FastAPI 유니티 서비스
+  mlagents-gym:
+    build: 
+      context: .
+      dockerfile: fast_unity/Dockerfile
+    container_name: mlagents-gym
+    volumes:
+      - ./fast_unity/unity/envs:/app/unity/envs
+      - ./fast_unity/models:/app/models
+      - ./fast_unity/train_logs:/app/train_logs
+    environment:
+      - DISPLAY=:0
+      # api-server의 베이스 주소를 환경 변수로 전달
+      - API_SERVER_URL=http://api-server:8080
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    tty: true
+    # VNC 포트 (비활성화)
+    #ports:
+      #- "6080:6080"
+      #- "5900:5900"
+    networks:
+      - unity-network
+    depends_on:
+      - signaling-server
+
+  # Node.js API 서버  
+  api-server:
+    build: 
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: api-server
+    depends_on:
+      - mongodb
+      - mlagents-gym
+    environment:
+      MONGODB_URI: "mongodb://mongodb:27017"
+      MONGODB_DB: rl_dashboard
+      # FastAPI 접근을 위한 설정 (컨테이너 이름으로 접근)
+      FASTAPI_BASE: "http://mlagents-gym:8000"
+    ports:
+      - "127.0.0.1:8080:8080"
+    networks:
+      - unity-network
+    restart: unless-stopped
+  
+  # WebSocket 시그널링 서버
+  signaling-server:
+    build: 
+      context: ./signaling-server
+      dockerfile: Dockerfile
+    container_name: signaling-server
+    ports:
+      - "127.0.0.1:80:80"
+    networks:
+      - unity-network
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+
+networks:
+  unity-network:
+    driver: bridge

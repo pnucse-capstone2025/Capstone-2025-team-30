@@ -172,9 +172,10 @@ docker compose up --build
 
 ### 6. 소개 자료 및 시연 영상
 
+
 #### 6.1. 프로젝트 소개 자료
 
-> 발표 슬라이드/문서 링크 추가
+[발표 자료](https://github.com/pnucse-capstone2025/Capstone-2025-team-30/blob/main/docs/03.%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C/2025%EC%A0%84%EA%B8%B0_30_%EA%B0%95%EC%95%84%EC%A7%80%EB%8F%84%ED%95%99%EC%8A%B5_%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C.pdf)
 
 #### 6.2. 시연 영상
 

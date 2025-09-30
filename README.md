@@ -224,7 +224,7 @@ docker compose up --build
 
 ### 8. 참고 문헌 및 출처
 
-* [OpenAI API Docs]
+* [OpenAI API Docs] https://platform.openai.com/docs/api-reference/introduction
 * [Stable Baselines3] https://github.com/DLR-RM/stable-baselines3
 * [Unity ML-Agents] https://github.com/Unity-Technologies/ml-agents
 * [Gymnasium] https://gymnasium.farama.org/index.html
